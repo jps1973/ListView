@@ -6,10 +6,22 @@
 HWND g_hWndListView;
 HWND g_hWndStatusBar;
 
-int ListViewWindowAddColumns()
+void ListViewWindowAutoSizeColumns()
 {
-	int nResult = 0;
+	int nWhichColumn;
 
+	// Loop through columns
+	for( nWhichColumn = 0; nWhichColumn < LIST_VIEW_WINDOW_NUMBER_OF_COLUMNS; nWhichColumn ++ )
+	{
+		// Auto-size column
+		SendMessage( g_hWndListView, LVM_SETCOLUMNWIDTH, ( WPARAM )nWhichColumn, ( LPARAM )LVSCW_AUTOSIZE_USEHEADER );
+
+	}; // End of loop through columns
+
+} // End of function ListViewWindowAddColumns
+
+void ListViewWindowAddColumns()
+{
 	int nWhichColumn;
 	LVCOLUMN lvColumn;
 
@@ -32,8 +44,6 @@ int ListViewWindowAddColumns()
 		SendMessage( g_hWndListView, LVM_INSERTCOLUMN, ( WPARAM )nWhichColumn, ( LPARAM )&lvColumn );
 
 	}; // End of loop through columns
-
-	return nResult;
 
 } // End of function ListViewWindowAddColumns
 
@@ -72,6 +82,9 @@ LRESULT CALLBACK MainWndProc( HWND hWndMain, UINT uMsg, WPARAM wParam, LPARAM lP
 
 				// Add columns to list view window
 				ListViewWindowAddColumns();
+
+				// Auto-size columns on list view window
+				ListViewWindowAutoSizeColumns();
 
 				// Create status bar window
 				g_hWndStatusBar = CreateWindowEx( STATUS_BAR_WINDOW_EXTENDED_STYLE, STATUSCLASSNAME, STATUS_BAR_WINDOW_TEXT, STATUS_BAR_WINDOW_STYLE, 0, 0, 0, 0, hWndMain, ( HMENU )NULL, hInstance, NULL );
