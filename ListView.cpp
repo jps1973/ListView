@@ -47,6 +47,52 @@ void ListViewWindowAddColumns()
 
 } // End of function ListViewWindowAddColumns
 
+int ListViewWindowAddItem( LPCTSTR lpszItemText )
+{
+	int nResult = 0;
+
+	LVITEM lvItem;
+
+	// Clear list view item structure
+	ZeroMemory( &lvItem, sizeof( lvItem ) );
+
+	// Initialise list view item structure
+	lvItem.mask			= LVIF_TEXT;
+	lvItem.cchTextMax	= STRING_LENGTH;
+	lvItem.iItem		= SendMessage( g_hWndListView, LVM_GETITEMCOUNT, ( WPARAM )NULL, ( LPARAM )NULL );
+	lvItem.iSubItem		= 0;
+	lvItem.pszText		= ( LPTSTR )lpszItemText;
+
+	// Insert item
+	nResult = SendMessage( g_hWndListView, LVM_INSERTITEM, ( WPARAM )lvItem.iItem, ( LPARAM )&lvItem );
+
+	return nResult;
+
+} // End of function ListViewWindowAddItem
+
+int ListViewWindowSetItemText( int nWhichItem, int nWhichSubItem, LPCTSTR lpszItemText )
+{
+	int nResult = 0;
+
+	LVITEM lvItem;
+
+	// Clear list view item structure
+	ZeroMemory( &lvItem, sizeof( lvItem ) );
+
+	// Initialise list view item structure
+	lvItem.mask			= LVIF_TEXT;
+	lvItem.cchTextMax	= STRING_LENGTH;
+	lvItem.iItem		= nWhichItem;
+	lvItem.iSubItem		= nWhichSubItem;
+	lvItem.pszText		= ( LPTSTR )lpszItemText;
+
+	// Insert item
+	nResult = SendMessage( g_hWndListView, LVM_SETITEM, ( WPARAM )lvItem.iItem, ( LPARAM )&lvItem );
+
+	return nResult;
+
+} // End of function ListViewWindowAddItem
+
 LRESULT CALLBACK MainWndProc( HWND hWndMain, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
 	LRESULT lr = 0;
@@ -454,6 +500,17 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow )
 
 			// Update main window
 			UpdateWindow( hWndMain );
+
+			// Populate list view window
+			ListViewWindowAddItem( "00" );
+			ListViewWindowSetItemText( 0, 1, "10" );
+			ListViewWindowAddItem( "01" );
+			ListViewWindowSetItemText( 1, 1, "11" );
+			ListViewWindowAddItem( "02" );
+			ListViewWindowSetItemText( 2, 1, "12" );
+
+			// Auto-size list view window columns
+			ListViewWindowAutoSizeColumns();
 
 			// Main message loop
 			while( GetMessage( &msg, NULL, 0, 0 ) > 0 )
