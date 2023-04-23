@@ -62,3 +62,14 @@ typedef enum
 	LIST_VIEW_WINDOW_NUMBER_OF_COLUMNS
 
 } ListViewWindowColumnIDs;
+
+void ListViewWindowAddColumns();
+
+int ListViewWindowAddItem( LPCTSTR lpszFirstItemText, LPCTSTR lpszSecondItemText );
+
+int ListViewWindowAddItem( LPCTSTR lpszItemText );
+
+void ListViewWindowAutoSizeColumns();
+
+int ListViewWindowSetItemText( int nWhichItem, int nWhichSubItem, LPCTSTR lpszItemText );
+

@@ -6,20 +6,6 @@
 HWND g_hWndListView;
 HWND g_hWndStatusBar;
 
-void ListViewWindowAutoSizeColumns()
-{
-	int nWhichColumn;
-
-	// Loop through columns
-	for( nWhichColumn = 0; nWhichColumn < LIST_VIEW_WINDOW_NUMBER_OF_COLUMNS; nWhichColumn ++ )
-	{
-		// Auto-size column
-		SendMessage( g_hWndListView, LVM_SETCOLUMNWIDTH, ( WPARAM )nWhichColumn, ( LPARAM )LVSCW_AUTOSIZE_USEHEADER );
-
-	}; // End of loop through columns
-
-} // End of function ListViewWindowAddColumns
-
 void ListViewWindowAddColumns()
 {
 	int nWhichColumn;
@@ -47,6 +33,27 @@ void ListViewWindowAddColumns()
 
 } // End of function ListViewWindowAddColumns
 
+int ListViewWindowAddItem( LPCTSTR lpszFirstItemText, LPCTSTR lpszSecondItemText )
+{
+	int nResult = 0;
+
+	// Add item
+	nResult = ListViewWindowAddItem( lpszFirstItemText );
+
+	// Ensure that first item was added
+	if( nResult >= 0 )
+	{
+		// Successfully addes item
+
+		// Set second item text
+		ListViewWindowSetItemText( nResult, LIST_VIEW_WINDOW_SECOND_COLUMN_ID, lpszSecondItemText );
+
+	} // End of successfully addes item
+
+	return nResult;
+
+} // End of function ListViewWindowAddItem
+
 int ListViewWindowAddItem( LPCTSTR lpszItemText )
 {
 	int nResult = 0;
@@ -70,9 +77,23 @@ int ListViewWindowAddItem( LPCTSTR lpszItemText )
 
 } // End of function ListViewWindowAddItem
 
+void ListViewWindowAutoSizeColumns()
+{
+	int nWhichColumn;
+
+	// Loop through columns
+	for( nWhichColumn = 0; nWhichColumn < LIST_VIEW_WINDOW_NUMBER_OF_COLUMNS; nWhichColumn ++ )
+	{
+		// Auto-size column
+		SendMessage( g_hWndListView, LVM_SETCOLUMNWIDTH, ( WPARAM )nWhichColumn, ( LPARAM )LVSCW_AUTOSIZE_USEHEADER );
+
+	}; // End of loop through columns
+
+} // End of function ListViewWindowAutoSizeColumns
+
 int ListViewWindowSetItemText( int nWhichItem, int nWhichSubItem, LPCTSTR lpszItemText )
 {
-	int nResult = 0;
+	int nResult;
 
 	LVITEM lvItem;
 
@@ -91,7 +112,7 @@ int ListViewWindowSetItemText( int nWhichItem, int nWhichSubItem, LPCTSTR lpszIt
 
 	return nResult;
 
-} // End of function ListViewWindowAddItem
+} // End of function ListViewWindowSetItemText
 
 LRESULT CALLBACK MainWndProc( HWND hWndMain, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
@@ -502,12 +523,9 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow )
 			UpdateWindow( hWndMain );
 
 			// Populate list view window
-			ListViewWindowAddItem( "00" );
-			ListViewWindowSetItemText( 0, 1, "10" );
-			ListViewWindowAddItem( "01" );
-			ListViewWindowSetItemText( 1, 1, "11" );
-			ListViewWindowAddItem( "02" );
-			ListViewWindowSetItemText( 2, 1, "12" );
+			ListViewWindowAddItem( "00", "10" );
+			ListViewWindowAddItem( "01", "11" );
+			ListViewWindowAddItem( "02", "12" );
 
 			// Auto-size list view window columns
 			ListViewWindowAutoSizeColumns();
