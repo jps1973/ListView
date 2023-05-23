@@ -91,6 +91,70 @@ void ListViewWindowAutoSizeColumns()
 
 } // End of function ListViewWindowAutoSizeColumns
 
+int CALLBACK ListViewWindowCompare( LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort )
+{
+	int nResult = 0;
+
+	LVITEM lvItem;
+
+	// Allocate string memory
+	LPTSTR lpszItemText1 = new char[ STRING_LENGTH ];
+	LPTSTR lpszItemText2 = new char[ STRING_LENGTH ];
+
+	// Clear list view item structure
+	::ZeroMemory( &lvItem, sizeof( lvItem ) );
+
+	// Initialise list view item structure for first item
+	lvItem.mask			= LVIF_TEXT;
+	lvItem.cchTextMax	= STRING_LENGTH;
+	lvItem.iSubItem		= lParamSort;
+	lvItem.iItem		= lParam1;
+	lvItem.pszText		= ( LPTSTR )lpszItemText1;
+
+	// Get first item text
+	::SendMessage( g_hWndListView, LVM_GETITEMTEXT, ( WPARAM )( lvItem.iItem ), ( LPARAM )&lvItem );
+
+	// Update list view item structure for second item
+	lvItem.iItem		= lParam2;
+	lvItem.pszText		= ( LPTSTR )lpszItemText2;
+
+	// Get first item text
+	::SendMessage( g_hWndListView, LVM_GETITEMTEXT, ( WPARAM )( lvItem.iItem ), ( LPARAM )&lvItem );
+
+	// Compare item texts
+	nResult = lstrcmpi( lpszItemText1, lpszItemText2 );
+
+	// Free string memory
+	delete [] lpszItemText1;
+	delete [] lpszItemText2;
+
+	return nResult;
+
+} // End of function ListViewWindowCompare
+
+int ListViewWindowGetItemText( int nWhichItem, int nWhichSubItem, LPTSTR lpszItemText )
+{
+	int nResult;
+
+	LVITEM lvItem;
+
+	// Clear list view item structure
+	ZeroMemory( &lvItem, sizeof( lvItem ) );
+
+	// Initialise list view item structure
+	lvItem.mask			= LVIF_TEXT;
+	lvItem.cchTextMax	= STRING_LENGTH;
+	lvItem.iItem		= nWhichItem;
+	lvItem.iSubItem		= nWhichSubItem;
+	lvItem.pszText		= lpszItemText;
+
+	// Insert item
+	nResult = SendMessage( g_hWndListView, LVM_GETITEM, ( WPARAM )lvItem.iItem, ( LPARAM )&lvItem );
+
+	return nResult;
+
+} // End of function ListViewWindowGetItemText
+
 int ListViewWindowSetItemText( int nWhichItem, int nWhichSubItem, LPCTSTR lpszItemText )
 {
 	int nResult;
@@ -364,9 +428,133 @@ LRESULT CALLBACK MainWndProc( HWND hWndMain, UINT uMsg, WPARAM wParam, LPARAM lP
 		case WM_NOTIFY:
 		{
 			// A notify message
+			LPNMHDR lpNmHdr;
 
-			// Call default handler
-			lr = DefWindowProc( hWndMain, uMsg, wParam, lParam );
+			// Get notify message handler
+			lpNmHdr = ( LPNMHDR )lParam;
+
+			// See if notify message is from list view window
+			if( lpNmHdr->hwndFrom == g_hWndListView )
+			{
+				// Notify message is from list view window
+
+				// Select notify message
+				switch( lpNmHdr->code )
+				{
+					case LVN_COLUMNCLICK:
+					{
+						// A column click notify message
+						LPNMLISTVIEW lpNmListView;
+
+						// Get list view notify message handler
+						lpNmListView = ( LPNMLISTVIEW )lParam;
+
+						// Sort list view window
+						SendMessage( g_hWndListView, LVM_SORTITEMSEX, ( WPARAM )( LPARAM )( lpNmListView->iSubItem ), ( LPARAM )&ListViewWindowCompare );
+						// Break out of switch
+						break;
+
+					} // End of a column click notify message
+					case LVN_ITEMCHANGED:
+					{
+						// An item changed notify message
+						LPNMLISTVIEW lpNmListView;
+
+						// Get list view notify message handler
+						lpNmListView = ( LPNMLISTVIEW )lParam;
+
+						// See if item state has changed
+						if( lpNmListView->uChanged & LVIF_STATE )
+						{
+							// Item state has changed
+
+							// See if item state has changed to selected
+							if( ( lpNmListView->uNewState ^ lpNmListView->uOldState ) & LVIS_SELECTED )
+							{
+								// Item state has changed to selected
+
+								// Allocate string memory
+								LPTSTR lpszSelectedItemText = new char[ STRING_LENGTH ];
+
+								// Get selected item text
+								if( ListViewWindowGetItemText( lpNmListView->iItem, LIST_VIEW_WINDOW_FIRST_COLUMN_ID, lpszSelectedItemText ) )
+								{
+									// Successfully got selected item text
+
+									// Show selected item text on status bar window
+									SendMessage( g_hWndStatusBar, SB_SETTEXT, ( WPARAM )NULL, ( LPARAM )lpszSelectedItemText );
+
+								} // End of successfully got selected item text
+
+								// Free string memory
+								delete [] lpszSelectedItemText;
+
+							} // End of the item state has changed to selected
+
+						} // End of the item has changed
+
+						// Break out of switch
+						break;
+
+					} // End of an item changed notify message
+					case NM_DBLCLK:
+					{
+						// A double-click notify message
+						int nSelectedItem;
+
+						// Get selected item
+						nSelectedItem = SendMessage( g_hWndListView, LVM_GETNEXTITEM, ( WPARAM )-1, ( LPARAM )LVNI_FOCUSED );
+
+						// Ensure that selected item was got
+						if( nSelectedItem >= 0 )
+						{
+							// Successfully got selected item
+
+							// Allocate string memory
+							LPTSTR lpszSelectedItemText = new char[ STRING_LENGTH ];
+
+							// Get selected item text
+							if( ListViewWindowGetItemText( nSelectedItem, LIST_VIEW_WINDOW_FIRST_COLUMN_ID, lpszSelectedItemText ) )
+							{
+								// Successfully got selected item text
+
+								// Display selected item text
+								MessageBox( NULL, lpszSelectedItemText, INFORMATION_MESSAGE_CAPTION, ( MB_OK | MB_ICONINFORMATION ) );
+
+							} // End of successfully got selected item text
+
+							// Free string memory
+							delete [] lpszSelectedItemText;
+
+						} // End of successfully got selected item
+
+						// Break out of switch
+						break;
+
+					} // End of a double-click notify message
+					default:
+					{
+						// Default notify message
+
+						// Call default handler
+						lr = DefWindowProc( hWndMain, uMsg, wParam, lParam );
+
+						// Break out of switch
+						break;
+
+					} // End of default notify message
+
+				}; // End of selection for notify message
+
+			} // End of notify message is from list view window
+			else
+			{
+				// Notify message is not from list view window
+
+				// Call default handler
+				lr = DefWindowProc( hWndMain, uMsg, wParam, lParam );
+
+			} // End of notify message is not from list view window
 
 			// Break out of switch
 			break;
@@ -523,9 +711,9 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow )
 			UpdateWindow( hWndMain );
 
 			// Populate list view window
-			ListViewWindowAddItem( "00", "10" );
+			ListViewWindowAddItem( "00", "12" );
 			ListViewWindowAddItem( "01", "11" );
-			ListViewWindowAddItem( "02", "12" );
+			ListViewWindowAddItem( "02", "10" );
 
 			// Auto-size list view window columns
 			ListViewWindowAutoSizeColumns();

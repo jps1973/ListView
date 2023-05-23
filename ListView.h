@@ -71,5 +71,6 @@ int ListViewWindowAddItem( LPCTSTR lpszItemText );
 
 void ListViewWindowAutoSizeColumns();
 
-int ListViewWindowSetItemText( int nWhichItem, int nWhichSubItem, LPCTSTR lpszItemText );
+int ListViewWindowGetItemText( int nWhichItem, int nWhichSubItem, LPTSTR lpszItemText );
 
+int ListViewWindowSetItemText( int nWhichItem, int nWhichSubItem, LPCTSTR lpszItemText );
