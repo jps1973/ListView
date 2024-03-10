@@ -28,7 +28,7 @@ typedef enum ListViewWindowColumns
 
 BOOL IsListViewWindow( HWND hWnd );
 
-int ListViewWindowAddString( LPCTSTR lpszString );
+int ListViewWindowAddItem( LPCTSTR lpszItemText );
 
 int ListViewWindowAutoSizeAllColumns();
 
@@ -48,3 +48,4 @@ HWND ListViewWindowSetFocus();
 
 void ListViewWindowSetFont( HFONT hFont );
 
+BOOL ListViewWindowSetItemText( int nWhichItem, int nWhichSubItem, LPCTSTR lpszItemText );

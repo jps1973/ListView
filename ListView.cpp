@@ -178,7 +178,7 @@ LRESULT CALLBACK MainWndProc( HWND hWndMain, UINT uMessage, WPARAM wParam, LPARA
 						// Successfully got file path
 
 						// Add file path to list view window
-						ListViewWindowAddString( lpszFilePath );
+						ListViewWindowAddItem( lpszFilePath );
 
 					} // End of successfully got file path
 
@@ -433,7 +433,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow )
 					lpszArgument[ nSizeNeeded ] = ( char )NULL;
 
 					// Add argument to list view window
-					ListViewWindowAddString( lpszArgument );
+					ListViewWindowAddItem( lpszArgument );
 
 				}; // End of loop through arguments
 
@@ -447,6 +447,16 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow )
 
 			// Update main window
 			UpdateWindow( hWndMain );
+
+			// Populate list view window
+			ListViewWindowAddItem( "1234567890" );
+			ListViewWindowAddItem( "qwertyuiop" );
+			ListViewWindowAddItem( "asdfghjkl" );
+			ListViewWindowAddItem( "zxcvbnm" );
+			ListViewWindowSetItemText( 0, LIST_VIEW_WINDOW_DETAILS_COLUMN_ID, "One" );
+			ListViewWindowSetItemText( 1, LIST_VIEW_WINDOW_DETAILS_COLUMN_ID, "Two" );
+			ListViewWindowSetItemText( 2, LIST_VIEW_WINDOW_DETAILS_COLUMN_ID, "Three" );
+			ListViewWindowSetItemText( 3, LIST_VIEW_WINDOW_DETAILS_COLUMN_ID, "Four" );
 
 			// Auto-size all list view window columns
 			ListViewWindowAutoSizeAllColumns();

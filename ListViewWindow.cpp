@@ -12,12 +12,28 @@ BOOL IsListViewWindow( HWND hWnd )
 
 } // End of function IsListViewWindow
 
-int ListViewWindowAddString( LPCTSTR lpszString )
+int ListViewWindowAddItem( LPCTSTR lpszItemText )
 {
-	// Add string to list view window
-	return ::SendMessage( g_hWndListView, LB_ADDSTRING, ( WPARAM )NULL, ( LPARAM )lpszString );
+	int nResult;
 
-} // End of function ListViewWindowAddString
+	LVITEM lvItem;
+
+	// Clear list view item structure
+	ZeroMemory( &lvItem, sizeof( lvItem ) );
+
+	// Initialise list view item structure
+	lvItem.mask			= LVIF_TEXT;
+	lvItem.cchTextMax	= STRING_LENGTH;
+	lvItem.iItem		= SendMessage( g_hWndListView, LVM_GETITEMCOUNT, ( WPARAM )NULL, ( LPARAM )NULL );
+	lvItem.iSubItem		= LIST_VIEW_WINDOW_NAME_COLUMN_ID;
+	lvItem.pszText		= ( LPTSTR )lpszItemText;
+
+	// Add item to list view window
+	nResult = SendMessage( g_hWndListView, LVM_INSERTITEM, ( WPARAM )lvItem.iItem, ( LPARAM )&lvItem );
+
+	return nResult;
+
+} // End of function ListViewWindowAddItem
 
 int ListViewWindowAutoSizeAllColumns()
 {
@@ -212,3 +228,26 @@ void ListViewWindowSetFont( HFONT hFont )
 	::SendMessage( g_hWndListView, WM_SETFONT, ( WPARAM )hFont, ( LPARAM )TRUE );
 
 } // End of function ListViewWindowSetFont
+
+BOOL ListViewWindowSetItemText( int nWhichItem, int nWhichSubItem, LPCTSTR lpszItemText )
+{
+	BOOL bResult;
+
+	LVITEM lvItem;
+
+	// Clear list view item structure
+	ZeroMemory( &lvItem, sizeof( lvItem ) );
+
+	// Initialise list view item structure
+	lvItem.mask			= LVIF_TEXT;
+	lvItem.cchTextMax	= STRING_LENGTH;
+	lvItem.iItem		= nWhichItem;
+	lvItem.iSubItem		= nWhichSubItem;
+	lvItem.pszText		= ( LPTSTR )lpszItemText;
+
+	// Set item text
+	bResult = SendMessage( g_hWndListView, LVM_SETITEM, ( WPARAM )NULL, ( LPARAM )&lvItem );
+
+	return bResult;
+
+} // End of function ListViewWindowSetItemText
