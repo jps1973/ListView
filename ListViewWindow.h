@@ -36,11 +36,11 @@ BOOL ListViewWindowCreate( HWND hWndParent, HINSTANCE hInstance );
 
 int ListViewWindowGetCurrentSelection();
 
-int ListViewWindowGetItemText( int nWhichItem, LPTSTR lpszItemText );
+BOOL ListViewWindowGetItemText( int nWhichItem, int nWhichSubItem, LPCSTR lpszItemText );
 
 BOOL ListViewWindowGetRect( LPRECT lpRect );
 
-BOOL ListViewWindowHandleCommandMessage( WPARAM wParam, LPARAM lParam, void( *lpDoubleClickFunction )( LPCTSTR lpszItemText ), void( *lpSelectionChangedFunction )( LPCTSTR lpszItemText ) );
+BOOL ListViewWindowHandleNotifyMessage( WPARAM wParam, LPARAM lParam, void( *lpDoubleClickFunction )( LPCTSTR lpszItemText ), void( *lpItemSelectedFunction )( LPCTSTR lpszItemText ) );
 
 BOOL ListViewWindowMove( int nX, int nY, int nWidth, int nHeight, BOOL bRepaint = TRUE );
 

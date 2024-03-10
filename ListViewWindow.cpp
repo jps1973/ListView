@@ -118,10 +118,26 @@ int ListViewWindowGetCurrentSelection()
 
 } // End of function ListViewWindowGetCurrentSelection
 
-int ListViewWindowGetItemText( int nWhichItem, LPTSTR lpszItemText )
+BOOL ListViewWindowGetItemText( int nWhichItem, int nWhichSubItem, LPTSTR lpszItemText )
 {
-	// Get item text
-	return::SendMessage( g_hWndListView, LB_GETTEXT, ( WPARAM )nWhichItem, ( LPARAM )lpszItemText );
+	BOOL bResult;
+
+	LVITEM lvItem;
+
+	// Clear list view item structure
+	ZeroMemory( &lvItem, sizeof( lvItem ) );
+
+	// Initialise list view item structure
+	lvItem.mask			= LVIF_TEXT;
+	lvItem.cchTextMax	= STRING_LENGTH;
+	lvItem.iItem		= nWhichItem;
+	lvItem.iSubItem		= nWhichSubItem;
+	lvItem.pszText		= lpszItemText;
+
+	// Set item text
+	bResult = SendMessage( g_hWndListView, LVM_GETITEM, ( WPARAM )NULL, ( LPARAM )&lvItem );
+
+	return bResult;
 
 } // End of function ListViewWindowGetItemText
 
@@ -132,31 +148,36 @@ BOOL ListViewWindowGetRect( LPRECT lpRect )
 
 } // End of function ListViewWindowGetRect
 
-BOOL ListViewWindowHandleCommandMessage( WPARAM wParam, LPARAM, void( *lpDoubleClickFunction )( LPCTSTR lpszItemText ), void( *lpSelectionChangedFunction )( LPCTSTR lpszItemText ) )
+BOOL ListViewWindowHandleNotifyMessage( WPARAM, LPARAM lParam, void( *lpDoubleClickFunction )( LPCTSTR lpszItemText ), void( *lpItemSelectedFunction )( LPCTSTR lpszItemText ) )
 {
 	BOOL bResult = FALSE;
 
-	// Select list view window notification code
-	switch( HIWORD( wParam ) )
+	LPNMHDR lpNmHdr;
+
+	// Get notify message handler
+	lpNmHdr = ( LPNMHDR )lParam;
+
+	// Select notify message
+	switch( lpNmHdr->code )
 	{
-		case LBN_DBLCLK:
+		case NM_DBLCLK:
 		{
-			// A list view window double click notification code
+			// A double-click notify message
 			int nSelectedItem;
 
 			// Allocate string memory
-			LPTSTR lpszSelectedItemText = new char[ STRING_LENGTH ];
+			LPTSTR lpszItemText = new char[ STRING_LENGTH ];
 
 			// Get selected item
-			nSelectedItem = ListViewWindowGetCurrentSelection();
+			nSelectedItem = SendMessage( g_hWndListView, LVM_GETNEXTITEM, ( WPARAM )-1, ( LPARAM )LVNI_FOCUSED );
 
 			// Get selected item text
-			if( ListViewWindowGetItemText( nSelectedItem, lpszSelectedItemText ) )
+			if( ListViewWindowGetItemText( nSelectedItem, 0, lpszItemText ) )
 			{
 				// Successfully got selected item text
 
 				// Call double click function
-				( *lpDoubleClickFunction )( lpszSelectedItemText );
+				( *lpDoubleClickFunction )( lpszItemText );
 
 				// Update return value
 				bResult = TRUE;
@@ -164,49 +185,53 @@ BOOL ListViewWindowHandleCommandMessage( WPARAM wParam, LPARAM, void( *lpDoubleC
 			} // End of successfully got selected item text
 
 			// Free string memory
-			delete [] lpszSelectedItemText;
+			delete [] lpszItemText;
 
 			// Break out of switch
 			break;
 
-		} // End of a list view window double click notification code
-		case LBN_SELCHANGE:
+		} // End of a double-click notify message
+		case LVN_ITEMCHANGED:
 		{
-			// A list view window selection change notification code
-			int nSelectedItem;
+			// A list view item changed notify message
+			LPNMLISTVIEW lpNmListView;
 
-			// Allocate string memory
-			LPTSTR lpszSelectedItemText = new char[ STRING_LENGTH ];
+			// Get list view notify message handler
+			lpNmListView = ( LPNMLISTVIEW )lParam;
 
-			// Get selected item
-			nSelectedItem = ListViewWindowGetCurrentSelection();
-
-			// Get selected item text
-			if( ListViewWindowGetItemText( nSelectedItem, lpszSelectedItemText ) )
+			// See if item is now selected
+			if( ( lpNmListView->uNewState ^ lpNmListView->uOldState ) & LVIS_SELECTED )
 			{
-				// Successfully got selected item text
+				// Item is now selected
 
-				// Call selection changed function
-				( *lpSelectionChangedFunction )( lpszSelectedItemText );
+				// Allocate string memory
+				LPTSTR lpszItemText = new char[ STRING_LENGTH ];
 
-				// Update return value
-				bResult = TRUE;
+				// Get selected item text
+				if( ListViewWindowGetItemText( lpNmListView->iItem, lpNmListView->iSubItem, lpszItemText ) )
+				{
+					// Successfully got selected item text
 
-			} // End of successfully got selected item text
+					// Call item selected function
+					( *lpItemSelectedFunction )( lpszItemText );
 
-			// Free string memory
-			delete [] lpszSelectedItemText;
+					// Update return value
+					bResult = TRUE;
 
-			// Break out of switch
-			break;
+				} // End of successfully got selected item text
 
-		} // End of a list view window selection change notification code
+				// Free string memory
+				delete [] lpszItemText;
 
-	}; // End of selection for list view window notification code
+			} // End of item is now selected
+
+		} // End of a list view item changed notify message
+
+	}; // End of selection for notify message
 
 	return bResult;
 
-} // End of function ListViewWindowHandleCommandMessage
+} // End of function ListViewWindowHandleNotifyMessage
 
 BOOL ListViewWindowMove( int nX, int nY, int nWidth, int nHeight, BOOL bRepaint )
 {
