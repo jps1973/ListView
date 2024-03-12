@@ -455,14 +455,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow )
 			UpdateWindow( hWndMain );
 
 			// Populate list view window
-			ListViewWindowAddItem( "1234567890" );
-			ListViewWindowAddItem( "qwertyuiop" );
-			ListViewWindowAddItem( "asdfghjkl" );
-			ListViewWindowAddItem( "zxcvbnm" );
-			ListViewWindowSetItemText( 0, LIST_VIEW_WINDOW_DETAILS_COLUMN_ID, "One" );
-			ListViewWindowSetItemText( 1, LIST_VIEW_WINDOW_DETAILS_COLUMN_ID, "Two" );
-			ListViewWindowSetItemText( 2, LIST_VIEW_WINDOW_DETAILS_COLUMN_ID, "Three" );
-			ListViewWindowSetItemText( 3, LIST_VIEW_WINDOW_DETAILS_COLUMN_ID, "Four" );
+			ListViewWindowAddFiles( ALL_FILES_FILTER );
 
 			// Auto-size all list view window columns
 			ListViewWindowAutoSizeAllColumns();

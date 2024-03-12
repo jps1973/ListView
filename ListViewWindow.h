@@ -28,6 +28,10 @@ typedef enum ListViewWindowColumns
 
 BOOL IsListViewWindow( HWND hWnd );
 
+int ListViewWindowAddFiles( LPCTSTR lpszFileFilter );
+
+int ListViewWindowAddFiles( LPCTSTR lpszFolderPath, LPCTSTR lpszFileFilter );
+
 int ListViewWindowAddItem( LPCTSTR lpszItemText );
 
 int ListViewWindowAutoSizeAllColumns();
@@ -38,7 +42,9 @@ BOOL ListViewWindowCreate( HWND hWndParent, HINSTANCE hInstance );
 
 int ListViewWindowGetCurrentSelection();
 
-BOOL ListViewWindowGetItemText( int nWhichItem, int nWhichSubItem, LPCSTR lpszItemText );
+BOOL ListViewWindowGetItemPath( int nWhichItem, LPTSTR lpszItemPath );
+
+BOOL ListViewWindowGetItemText( int nWhichItem, int nWhichSubItem, LPTSTR lpszItemText );
 
 BOOL ListViewWindowGetRect( LPRECT lpRect );
 
