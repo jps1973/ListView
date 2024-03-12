@@ -68,6 +68,49 @@ int ListViewWindowAutoSizeAllColumns()
 
 } // End of function ListViewWindowAutoSizeAllColumns
 
+int CALLBACK ListViewWindowCompareProcedure( LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort )
+{
+	int nResult;
+
+	LVITEM lvItem;
+
+	// Allocate string memory
+	LPTSTR lpszBuffer1 = new char[ STRING_LENGTH ];
+	LPTSTR lpszBuffer2 = new char[ STRING_LENGTH ];
+
+	// Clear list view item structure
+	ZeroMemory( &lvItem, sizeof( lvItem ) );
+
+	// Initialise list view item structure
+	lvItem.mask			= LVIF_TEXT;
+	lvItem.iSubItem		= lParamSort;
+	lvItem.cchTextMax	= STRING_LENGTH;
+
+	// Update list view item structure for first item
+	lvItem.iItem	= lParam1;
+	lvItem.pszText	= lpszBuffer1;
+
+	// Get first item text
+	SendMessage( g_hWndListView, LVM_GETITEMTEXT, ( WPARAM )lvItem.iItem, ( LPARAM )&lvItem );
+
+	// Update list view item structure for second item
+	lvItem.iItem	= lParam2;
+	lvItem.pszText	= lpszBuffer2;
+
+	// Get second item text
+	SendMessage( g_hWndListView, LVM_GETITEMTEXT, ( WPARAM )lvItem.iItem, ( LPARAM )&lvItem );
+
+	// Update return value
+	nResult = lstrcmp( lpszBuffer1, lpszBuffer2 );
+
+	// Free string memory
+	delete [] lpszBuffer1;
+	delete [] lpszBuffer2;
+
+	return nResult;
+
+} // End of function ListViewWindowCompareProcedure
+
 BOOL ListViewWindowCreate( HWND hWndParent, HINSTANCE hInstance )
 {
 	BOOL bResult = FALSE;
@@ -160,6 +203,24 @@ BOOL ListViewWindowHandleNotifyMessage( WPARAM, LPARAM lParam, void( *lpDoubleCl
 	// Select notify message
 	switch( lpNmHdr->code )
 	{
+		case LVN_COLUMNCLICK:
+		{
+			// A list view window column click notification code
+			LPNMLISTVIEW lpNmListView;
+
+			// Get list view notify message handler
+			lpNmListView = ( LPNMLISTVIEW )lpNmHdr;
+
+			// Sort the list view
+			::SendMessage( g_hWndListView, LVM_SORTITEMSEX, ( WPARAM )( lpNmListView->iSubItem ), ( LPARAM )&ListViewWindowCompareProcedure );
+
+			// Update return value
+			bResult = TRUE;
+
+			// Break out of switch
+			break;
+
+		} // End of a list view window column click notification code
 		case NM_DBLCLK:
 		{
 			// A double-click notify message
