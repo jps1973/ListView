@@ -1,20 +1,20 @@
-// Template.cpp
+// ListView.cpp
 
-#include "Template.h"
+#include "ListView.h"
 
-void ListBoxWindowDoubleClickFunction( LPCTSTR lpszItemText )
+void ListViewWindowDoubleClickFunction( LPCTSTR lpszItemText )
 {
 	// Display item text
 	MessageBox( NULL, lpszItemText, INFORMATION_MESSAGE_CAPTION, ( MB_OK | MB_ICONINFORMATION ) );
 
-} // End of function ListBoxWindowDoubleClickFunction
+} // End of function ListViewWindowDoubleClickFunction
 
-void ListBoxWindowSelectionChangedFunction( LPCTSTR lpszItemText )
+void ListViewWindowSelectionChangedFunction( LPCTSTR lpszItemText )
 {
 	// Show item text on status bar window
 	StatusBarWindowSetText( lpszItemText );
 
-} // End of function ListBoxWindowSelectionChangedFunction
+} // End of function ListViewWindowSelectionChangedFunction
 
 int ShowAboutMessage( HWND hWndParent )
 {
@@ -56,17 +56,17 @@ LRESULT CALLBACK MainWindowProcedure( HWND hWndMain, UINT uMessage, WPARAM wPara
 			// Get instance
 			hInstance = GetModuleHandle( NULL );
 
-			// Create list box window
-			if( ListBoxWindowCreate( hWndMain, hInstance ) )
+			// Create list view window
+			if( ListViewWindowCreate( hWndMain, hInstance ) )
 			{
-				// Successfully created list box window
+				// Successfully created list view window
 				HFONT hFont;
 
 				// Get font
 				hFont = ( HFONT )GetStockObject( DEFAULT_GUI_FONT );
 
-				// Set list box window font
-				ListBoxWindowSetFont( hFont );
+				// Set list view window font
+				ListViewWindowSetFont( hFont );
 
 				// Create status bar window
 				if( StatusBarWindowCreate( hWndMain, hInstance ) )
@@ -78,7 +78,7 @@ LRESULT CALLBACK MainWindowProcedure( HWND hWndMain, UINT uMessage, WPARAM wPara
 
 				} // End of successfully created status bar window
 
-			} // End of successfully created list box window
+			} // End of successfully created list view window
 
 			// Break out of switch
 			break;
@@ -91,7 +91,7 @@ LRESULT CALLBACK MainWindowProcedure( HWND hWndMain, UINT uMessage, WPARAM wPara
 			int nClientHeight;
 			RECT rcStatusBar;
 			int nStatusBarWindowHeight;
-			int nListBoxWindowHeight;
+			int nListViewWindowHeight;
 
 			// Get client size
 			nClientWidth	= LOWORD( lParam );
@@ -105,10 +105,10 @@ LRESULT CALLBACK MainWindowProcedure( HWND hWndMain, UINT uMessage, WPARAM wPara
 
 			// Calculate window sizes
 			nStatusBarWindowHeight	= ( rcStatusBar.bottom - rcStatusBar.top );
-			nListBoxWindowHeight	= ( nClientHeight - nStatusBarWindowHeight );
+			nListViewWindowHeight	= ( nClientHeight - nStatusBarWindowHeight );
 
 			// Move control windows
-			ListBoxWindowMove( 0, 0, nClientWidth, nListBoxWindowHeight, TRUE );
+			ListViewWindowMove( 0, 0, nClientWidth, nListViewWindowHeight, TRUE );
 
 			// Break out of switch
 			break;
@@ -118,8 +118,8 @@ LRESULT CALLBACK MainWindowProcedure( HWND hWndMain, UINT uMessage, WPARAM wPara
 		{
 			// An activate message
 
-			// Focus on list box window
-			ListBoxWindowSetFocus();
+			// Focus on list view window
+			ListViewWindowSetFocus();
 
 			// Break out of switch
 			break;
@@ -171,30 +171,30 @@ LRESULT CALLBACK MainWindowProcedure( HWND hWndMain, UINT uMessage, WPARAM wPara
 				{
 					// Default command
 
-					// See if command is from list box window
-					if( IsListBoxWindow( ( HWND )lParam ) )
+					// See if command is from list view window
+					if( IsListViewWindow( ( HWND )lParam ) )
 					{
-						// Command is from list box window
+						// Command is from list view window
 
-						// Handle command from list box window
-						if( !( ListBoxWindowHandleCommandMessage( wParam, lParam, &ListBoxWindowDoubleClickFunction, &ListBoxWindowSelectionChangedFunction ) ) )
+						// Handle command from list view window
+						if( !( ListViewWindowHandleCommandMessage( wParam, lParam, &ListViewWindowDoubleClickFunction, &ListViewWindowSelectionChangedFunction ) ) )
 						{
-							// Command was not handled from list box window
+							// Command was not handled from list view window
 
 							// Call default procedure
 							lr = DefWindowProc( hWndMain, uMessage, wParam, lParam );
 
-						} // End of command was not handled from list box window
+						} // End of command was not handled from list view window
 
-					} // End of command is from list box window
+					} // End of command is from list view window
 					else
 					{
-						// Command is not from list box window
+						// Command is not from list view window
 
 						// Call default procedure
 						lr = DefWindowProc( hWndMain, uMessage, wParam, lParam );
 
-					} // End of command is not from list box window
+					} // End of command is not from list view window
 
 					// Break out of switch
 					break;
@@ -356,11 +356,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE,  LPSTR, int nCmdShow )
 			// Update main window
 			UpdateWindow( hWndMain );
 
-			// Populate list box window
-			nItemCount = ListBoxWindowPopulate();
+			// Populate list view window
+			nItemCount = ListViewWindowPopulate();
 
 			// Format status message
-			wsprintf( lpszStatusMessage, LIST_BOX_WINDOW_POPULATE_STATUS_MESSAGE_FORMAT_STRING, nItemCount );
+			wsprintf( lpszStatusMessage, LIST_VIEW_WINDOW_POPULATE_STATUS_MESSAGE_FORMAT_STRING, nItemCount );
 
 			// Show status message on status bar window
 			StatusBarWindowSetText( lpszStatusMessage );
