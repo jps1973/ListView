@@ -46,15 +46,15 @@ int CALLBACK ListViewWindowCompare( LPARAM lParam1, LPARAM lParam2, LPARAM lPara
 	LVITEM lvItem;
 
 	// Allocate string memory
-	LPTSTR lpszItemText1 = new char[ STRING_LENGTH ];
-	LPTSTR lpszItemText2 = new char[ STRING_LENGTH ];
+	LPTSTR lpszItemText1 = new char[ STRING_LENGTH + sizeof( char ) ];
+	LPTSTR lpszItemText2 = new char[ STRING_LENGTH + sizeof( char ) ];
 
 	// Clear list view item structure
 	::ZeroMemory( &lvItem, sizeof( lvItem ) );
 
 	// Initialise list view item structure for first item
 	lvItem.mask			= LVIF_TEXT;
-	lvItem.cchTextMax	= STRING_LENGTH;
+	lvItem.cchTextMax	= ( STRING_LENGTH + sizeof( char ) );
 	lvItem.iSubItem		= lParamSort;
 	lvItem.iItem		= lParam1;
 	lvItem.pszText		= ( LPTSTR )lpszItemText1;
@@ -208,7 +208,7 @@ BOOL ListViewWindowHandleNotifyMessage( WPARAM, LPARAM lParam, void( *lpSelectio
 				// Selection has changed
 
 				// Allocate string memory
-				LPTSTR lpszItemText = new char[ STRING_LENGTH ];
+				LPTSTR lpszItemText = new char[ STRING_LENGTH + sizeof( char ) ];
 
 				// Get item text
 				if( ListViewWindowGetItemText( lpNmListView->iItem, lpNmListView->iSubItem, lpszItemText ) )
@@ -242,7 +242,7 @@ BOOL ListViewWindowHandleNotifyMessage( WPARAM, LPARAM lParam, void( *lpSelectio
 				// An item is selected
 
 				// Allocate string memory
-				LPTSTR lpszItemText = new char[ STRING_LENGTH ];
+				LPTSTR lpszItemText = new char[ STRING_LENGTH + sizeof( char ) ];
 
 				// Get item text
 				if( ListViewWindowGetItemText( lpNmListView->iItem, lpNmListView->iSubItem, lpszItemText ) )
@@ -295,7 +295,7 @@ int ListViewWindowPopulate()
 	int nResult = 0;
 
 	// Add items to list view window
-	ListViewWindowAdditem( "1234567890" );
+	ListViewWindowAdditem( "123,456,789,0" );
 	ListViewWindowAdditem( "qwertyuiop" );
 	ListViewWindowAdditem( "asdfghjkl" );
 	ListViewWindowAdditem( "zxcvbnm" );
@@ -315,6 +315,125 @@ int ListViewWindowPopulate()
 	return nResult;
 
 } // End of function ListViewWindowPopulate
+
+BOOL ListViewWindowSave( LPCTSTR lpszFileName, LPCTSTR lpszItemSeparator )
+{
+	BOOL bResult = FALSE;
+
+	HANDLE hFile;
+
+	// Create file
+	hFile = CreateFile( lpszFileName, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL );
+
+	// Ensure that file was created
+	if( hFile != INVALID_HANDLE_VALUE )
+	{
+		// Successfully created file
+		int nWhichItem;
+		int nWhichSubItem;
+		int nItemCount;
+		DWORD dwItemTextLength;
+		DWORD dwItemSeparatorLength;
+		DWORD dwNewLineTextLength;
+
+		// Allocate string memory
+		LPTSTR lpszItemText		= new char[ STRING_LENGTH + sizeof( char ) ];
+		LPTSTR lpszTemporary	= new char[ STRING_LENGTH + sizeof( char ) ];
+
+		// Store text lengths
+		dwItemSeparatorLength	= lstrlen( lpszItemSeparator );
+		dwNewLineTextLength		= lstrlen( NEW_LINE_TEXT );
+
+		// Count items on list view window
+		nItemCount = SendMessage( g_hWndListView, LVM_GETITEMCOUNT, ( WPARAM )NULL, ( LPARAM )NULL );
+
+		// Update return value (assume success)
+		bResult = TRUE;
+
+		// Loop through items on list view window
+		for( nWhichItem = 0; nWhichItem < nItemCount; nWhichItem ++ )
+		{
+			// Loop through sub-items on list view window
+			for( nWhichSubItem = 0; nWhichSubItem < LIST_VIEW_WINDOW_NUMBER_OF_COLUMNS; nWhichSubItem ++ )
+			{
+				// Get item text
+				if( ListViewWindowGetItemText( nWhichItem, nWhichSubItem, lpszItemText ) )
+				{
+					// Successfully got item text
+
+					// See if item text contains item separator
+					if( strstr( lpszItemText, lpszItemSeparator ) )
+					{
+						// Item text contains item separator
+
+						// Copy item text into temporary string
+						lstrcpy( lpszTemporary, lpszItemText );
+
+						// Put item text into inverted commas
+						wsprintf( lpszItemText, LIST_VIEW_WINDOW_ITEM_TEXT_IN_INVERTED_COMMAS_FORMAT_STRING, lpszTemporary );
+
+					} // End of item text contains item separator
+
+					// Get item text length
+					dwItemTextLength = lstrlen( lpszItemText );
+
+					// Write item text to file
+					if( WriteFile( hFile, lpszItemText, dwItemTextLength, NULL, NULL ) )
+					{
+						// Successfully wrote item text to file
+
+						// See if this is the last sub-item
+						if( nWhichSubItem < ( LIST_VIEW_WINDOW_NUMBER_OF_COLUMNS - 1 ) )
+						{
+							// This is not the last sub-item
+
+							// Write item separator to file
+							WriteFile( hFile, lpszItemSeparator, dwItemSeparatorLength, NULL, NULL );
+
+						} // End of this is not the last sub-item
+
+					} // End of successfully wrote item text to file
+					else
+					{
+						// Unable to write item text to file
+
+						// Update return value
+						bResult = FALSE;
+
+						// Force exit from loops
+						nWhichItem = nItemCount;
+						nWhichSubItem = LIST_VIEW_WINDOW_NUMBER_OF_COLUMNS;
+
+					} // End of unable to write item text to file
+
+				} // End of successfully got item text
+
+			}; // End of loop through sub-items on list view window
+
+			// See if this is the last item
+			if( nWhichItem < ( nItemCount - 1 ) )
+			{
+				// This is not the last item
+
+				// Write new line to file
+				WriteFile( hFile, NEW_LINE_TEXT, dwNewLineTextLength, NULL, NULL );
+
+			} // End of this is not the last item
+
+		}; // End of loop through items on list view window
+
+		// Free string memory
+		delete [] lpszItemText;
+		delete [] lpszTemporary;
+
+		// Close file
+		CloseHandle( hFile );
+
+	} // End of successfully created file
+
+	return bResult;
+
+} // End of function ListViewWindowSave
 
 HWND ListViewWindowSetFocus()
 {

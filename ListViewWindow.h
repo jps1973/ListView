@@ -18,6 +18,10 @@
 
 #define LIST_VIEW_WINDOW_POPULATE_STATUS_MESSAGE_FORMAT_STRING					"%d items"
 
+#define LIST_VIEW_WINDOW_ITEM_TEXT_IN_INVERTED_COMMAS_FORMAT_STRING				"\"%s\""
+
+#define LIST_VIEW_WINDOW_UNABLE_TO_SAVE_FILE_WARNING_MESSAGE_FORMAT_STRING		"Unable to save file.\r\n\r\nDo you want to close?"
+
 #define LIST_VIEW_WINDOW_COLUMN_TITLES											{ "Name", "Details" }
 
 typedef enum
@@ -50,6 +54,8 @@ BOOL ListViewWindowHandleNotifyMessage( WPARAM wParam, LPARAM lParam, void( *lpS
 BOOL ListViewWindowMove( int nX, int nY, int nWidth, int nHeight, BOOL bRepaint = TRUE );
 
 int ListViewWindowPopulate();
+
+BOOL ListViewWindowSave( LPCTSTR lpszFileName, LPCTSTR lpszItemSeparator );
 
 HWND ListViewWindowSetFocus();
 

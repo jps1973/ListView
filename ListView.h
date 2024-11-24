@@ -34,6 +34,8 @@
 #define SYSTEM_MENU_ABOUT_ITEM_POSITION											6
 #define SYSTEM_MENU_ABOUT_ITEM_TEXT												"About"
 
+#define SAVE_FILE_NAME															"ListView.csv"
+
 #define ABOUT_MESSAGE_TEXT														"ListView\r\n"						\
 																				"\r\n"								\
 																				"Written by Jim Smith\r\n"			\

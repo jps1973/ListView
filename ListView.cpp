@@ -277,8 +277,30 @@ LRESULT CALLBACK MainWindowProcedure( HWND hWndMain, UINT uMessage, WPARAM wPara
 		{
 			// A close message
 
-			// Destroy main window
-			DestroyWindow( hWndMain );
+			// Save list view window
+			if( ListViewWindowSave( SAVE_FILE_NAME, ASCII_COMMA_STRING ) )
+			{
+				// Successfully saved list view window
+
+				// Destroy main window
+				DestroyWindow( hWndMain );
+
+			} // End of successfully saved list view window
+			else
+			{
+				// Unable to save list view window
+				
+				// Ensure that user is ok to continue
+				if( MessageBox( hWndMain, LIST_VIEW_WINDOW_UNABLE_TO_SAVE_FILE_WARNING_MESSAGE_FORMAT_STRING, WARNING_MESSAGE_CAPTION, ( MB_YESNO | MB_ICONWARNING | MB_DEFBUTTON2 ) ) == IDYES )
+				{
+					// User is ok to continue
+
+					// Destroy main window
+					DestroyWindow( hWndMain );
+
+				} // End of user is ok to continue
+
+			} // End of unable to save list view window
 
 			// Break out of switch
 			break;
@@ -354,7 +376,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE,  LPSTR, int nCmdShow )
 			int nItemCount;
 
 			// Allocate string memory
-			LPTSTR lpszStatusMessage = new char[ STRING_LENGTH ];
+			LPTSTR lpszStatusMessage = new char[ STRING_LENGTH + sizeof( char ) ];
 
 			// Get system menu
 			hMenuSystem = GetSystemMenu( hWndMain, FALSE );
