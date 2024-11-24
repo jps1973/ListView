@@ -171,30 +171,8 @@ LRESULT CALLBACK MainWindowProcedure( HWND hWndMain, UINT uMessage, WPARAM wPara
 				{
 					// Default command
 
-					// See if command is from list view window
-					if( IsListViewWindow( ( HWND )lParam ) )
-					{
-						// Command is from list view window
-
-						// Handle command from list view window
-						if( !( ListViewWindowHandleCommandMessage( wParam, lParam, &ListViewWindowDoubleClickFunction, &ListViewWindowSelectionChangedFunction ) ) )
-						{
-							// Command was not handled from list view window
-
-							// Call default procedure
-							lr = DefWindowProc( hWndMain, uMessage, wParam, lParam );
-
-						} // End of command was not handled from list view window
-
-					} // End of command is from list view window
-					else
-					{
-						// Command is not from list view window
-
-						// Call default procedure
-						lr = DefWindowProc( hWndMain, uMessage, wParam, lParam );
-
-					} // End of command is not from list view window
+					// Call default procedure
+					lr = DefWindowProc( hWndMain, uMessage, wParam, lParam );
 
 					// Break out of switch
 					break;
@@ -243,6 +221,43 @@ LRESULT CALLBACK MainWindowProcedure( HWND hWndMain, UINT uMessage, WPARAM wPara
 			break;
 
 		} // End of a system command message
+		case WM_NOTIFY:
+		{
+			// A notify message
+			LPNMHDR lpNmHdr;
+
+			// Get notify message information
+			lpNmHdr = ( LPNMHDR )lParam;
+
+			// See if notify message is from list view window
+			if( IsListViewWindow( lpNmHdr->hwndFrom ) )
+			{
+				// Notify message is from list view window
+
+				// Handle notify message from list view window
+				if( !( ListViewWindowHandleNotifyMessage( wParam, lParam, &ListViewWindowSelectionChangedFunction, &ListViewWindowDoubleClickFunction ) ) )
+				{
+					// Notify message was not handled from list view window
+
+					// Call default procedure
+					lr = DefWindowProc( hWndMain, uMessage, wParam, lParam );
+
+				} // End of notify message was not handled from list view window
+
+			} // End of notify message is from list view window
+			else
+			{
+				// Notify message is not from list view window
+
+				// Call default procedure
+				lr = DefWindowProc( hWndMain, uMessage, wParam, lParam );
+
+			} // End of notify message is not from list view window
+
+			// Break out of switch
+			break;
+
+		} // End of a notify message
 		case WM_CONTEXTMENU:
 		{
 			// A context menu message

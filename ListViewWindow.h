@@ -35,6 +35,8 @@ int ListViewWindowAdditem( LPCTSTR lpszItemText, DWORD dwMaximumItemTextLength =
 
 void ListViewWindowAutoSizeAllColumns();
 
+int CALLBACK ListViewWindowCompare( LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort );
+
 BOOL ListViewWindowCreate( HWND hWndParent, HINSTANCE hInstance );
 
 int ListViewWindowGetItemCount();
@@ -43,7 +45,7 @@ int ListViewWindowGetItemText( int nWhichItem, int nWhichSubItem, LPTSTR lpszIte
 
 BOOL ListViewWindowGetRect( LPRECT lpRect );
 
-BOOL ListViewWindowHandleCommandMessage( WPARAM wParam, LPARAM lParam, void( *lpDoubleClickFunction )( LPCTSTR lpszItemText ), void( *lpSelectionChangedFunction )( LPCTSTR lpszItemText ) );
+BOOL ListViewWindowHandleNotifyMessage( WPARAM wParam, LPARAM lParam, void( *lpSelectionChangedFunction )( LPCTSTR lpszItemText ), void( *lpDoubleClickFunction )( LPCTSTR lpszItemText ) );
 
 BOOL ListViewWindowMove( int nX, int nY, int nWidth, int nHeight, BOOL bRepaint = TRUE );
 
