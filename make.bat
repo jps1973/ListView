@@ -6,11 +6,11 @@ windres Resource.rc -o Resource.o
 
 g++ -mwindows -m64 -static -Wall -Wextra ^
  ^
- Template.cpp ^
+ ListView.cpp ^
  ^
- ListBoxWindow.cpp ^
+ ListViewWindow.cpp ^
  StatusBarWindow.cpp ^
  ^
  Resource.o ^
  ^
- -o Template.exe
+ -o ListView.exe
