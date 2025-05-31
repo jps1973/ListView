@@ -79,8 +79,8 @@ int CALLBACK ListViewWindowCompare( LPARAM lParam1, LPARAM lParam2, LPARAM lPara
 	LVITEM lvItem;
 
 	// Allocate string memory
-	LPTSTR lpszItem1 = new char[ STRING_LENGTH ];
-	LPTSTR lpszItem2 = new char[ STRING_LENGTH ];
+	LPTSTR lpszItem1 = new char[ STRING_LENGTH + sizeof( char ) ];
+	LPTSTR lpszItem2 = new char[ STRING_LENGTH + sizeof( char ) ];
 
 	// Clear list view item structure
 	ZeroMemory( &lvItem, sizeof( lvItem ) );
@@ -296,7 +296,7 @@ BOOL ListViewWindowHandleNotifyMessage( WPARAM, LPARAM lParam, BOOL( *lpStatusFu
 			// A double click notify message
 
 			// Allocate string memory
-			LPTSTR lpszFilePath = new char[ STRING_LENGTH ];
+			LPTSTR lpszFilePath = new char[ STRING_LENGTH + sizeof( char ) ];
 
 			// Get file path
 			if( ListViewWindowGetItemText( lpNmListView->iItem, lpNmListView->iSubItem, lpszFilePath ) )
